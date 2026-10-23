@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KaamSetu – Job App Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F4F3;--card:#FFFFFF;--ink:#13211E;--mute:#5B6B67;--line:#DCE3E0;--brand:#0B6B5D;--brand-ink:#FFFFFF;--hi:#FFD84D;--hi-ink:#3A2F00;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1614;--card:#16221F;--ink:#E8F0ED;--mute:#93A59F;--line:#27372F;--brand:#37C2AC;--brand-ink:#06201B;--hi:#FFD84D;--hi-ink:#3A2F00;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1614;--card:#16221F;--ink:#E8F0ED;--mute:#93A59F;--line:#27372F;--brand:#37C2AC;--brand-ink:#06201B;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Mukta','Noto Sans Devanagari',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:16px;line-height:1.45}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px 96px}
+header{padding:18px 0 10px}
+h1{font-size:26px;font-weight:800;margin:0 0 2px;letter-spacing:-.3px}
+.sub{color:var(--mute);margin:0 0 12px;font-size:14px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:9px;border-radius:9px;cursor:pointer}
+.seg button.on{background:var(--brand);color:var(--brand-ink)}
+.search{width:100%;margin:12px 0 8px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;padding:6px 14px;border-radius:99px;cursor:pointer}
+.chip.on{background:var(--hi);color:var(--hi-ink);border-color:var(--hi);font-weight:600}
+.job{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+.job.feat{border-left:5px solid var(--hi)}
+.job h3{margin:0 0 2px;font-size:18px}
+.meta{color:var(--mute);font-size:14px}
+.sal{font-weight:800;color:var(--brand);margin-top:6px}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}
+.btn{border:0;background:var(--brand);color:var(--brand-ink);font:inherit;font-weight:600;padding:10px 16px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:none;color:var(--brand);border:1px solid var(--brand)}
+.btn:disabled{opacity:.5}
+.tag{font-size:12px;background:var(--hi);color:var(--hi-ink);padding:2px 8px;border-radius:6px;font-weight:600}
+.st{font-size:13px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+label{display:block;font-weight:600;margin:12px 0 4px;font-size:14px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:80px}
+.empty{text-align:center;color:var(--mute);padding:32px 8px}
+.note{background:var(--card);border:1px dashed var(--brand);border-radius:12px;padding:10px 12px;color:var(--mute);font-size:14px;margin:6px 0 12px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav .in{display:flex;max-width:520px;width:100%}
+nav button{flex:1;border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:14px 4px;cursor:pointer}
+nav button.on{color:var(--brand);box-shadow:inset 0 3px 0 var(--brand)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:90%;overflow:auto}
+.app-row{border-top:1px solid var(--line);padding:8px 0;font-size:14px}
+#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:20;display:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--hi);outline-offset:1px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="toast"></div>
+<script>
+var CATS=['सभी','Sales','Telecaller','Advisor','Delivery','Data Entry'];
+var SEED_JOBS=[
+{id:1,title:'Insurance Advisor',cat:'Advisor',sal:'₹20,000–40,000 + incentive',city:'Mumbai',desc:'Training दी जाएगी। Fresher भी apply कर सकते हैं।',feat:true,mine:true,co:'आपकी कंपनी'},
+{id:2,title:'Telecaller (Hindi)',cat:'Telecaller',sal:'₹12,000–18,000',city:'Mumbai',desc:'दिन की shift, 6 दिन काम।',feat:false,mine:true,co:'आपकी कंपनी'},
+{id:3,title:'Field Sales Executive',cat:'Sales',sal:'₹15,000–25,000',city:'Thane',desc:'Bike और license ज़रूरी। Petrol allowance मिलेगा।',feat:true,mine:false,co:'Shree Traders'},
+{id:4,title:'Delivery Partner',cat:'Delivery',sal:'₹18,000–30,000',city:'Mumbai',desc:'अपनी bike चाहिए। हर हफ्ते payment।',feat:false,mine:false,co:'QuickBite'},
+{id:5,title:'Telecaller (Female)',cat:'Telecaller',sal:'₹10,000–15,000',city:'Pune',desc:'Work from office, सिर्फ़ दिन की shift।',feat:false,mine:false,co:'Sai Services'},
+{id:6,title:'Mutual Fund Advisor',cat:'Advisor',sal:'₹25,000–50,000',city:'Navi Mumbai',desc:'Finance का basic ज्ञान और अच्छी communication।',feat:false,mine:false,co:'WealthPath'},
+{id:7,title:'Data Entry Operator',cat:'Data Entry',sal:'₹12,000–18,000',city:'Mumbai',desc:'Typing speed 30 WPM और MS Excel का basic ज्ञान। Office में काम।',feat:false,mine:true,co:'आपकी कंपनी'},
+{id:8,title:'Data Entry (Work from Home)',cat:'Data Entry',sal:'₹10,000–15,000',city:'Pune',desc:'Laptop और internet ज़रूरी। Part-time भी चलेगा।',feat:false,mine:false,co:'Gupta Enterprises'}];
+var SEED_APPS=[{id:1,jobId:1,name:'Rohit Yadav',phone:'98XXXXXX01',at:'आज'},{id:2,jobId:1,name:'Pooja Shah',phone:'97XXXXXX22',at:'कल'},{id:3,jobId:7,name:'Amit Verma',phone:'99XXXXXX35',at:'आज'}];
+var S={role:'cand',tab:0,cat:'सभी',q:'',open:null,showApps:null,jobs:SEED_JOBS,apps:SEED_APPS,sheet:null};
+function load(){try{var j=localStorage.getItem('ks2_jobs'),a=localStorage.getItem('ks2_apps');if(j)S.jobs=JSON.parse(j);if(a)S.apps=JSON.parse(a)}catch(e){}}
+function save(){try{localStorage.setItem('ks2_jobs',JSON.stringify(S.jobs));localStorage.setItem('ks2_apps',JSON.stringify(S.apps))}catch(e){}}
+function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function waLink(j,d){var n=j.wa||'7389551908';if(n.length===10)n='91'+n;return 'https://wa.me/'+n+'?text='+encodeURIComponent('नमस्ते, मैं '+d.name+' हूँ। मैंने KaamSetu पर "'+j.title+'" job के लिए apply किया है। मेरा नंबर: '+d.phone+(d.city?'\nशहर: '+d.city:'')+(d.age?'\nउम्र: '+d.age:'')+(d.exp?'\nExperience: '+d.exp:''))}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none'},2200)}
+function jobCard(j,mode){
+ var applied=S.apps.some(function(a){return a.jobId===j.id&&a.mine});
+ var h='<div class="job'+(j.feat?' feat':'')+'"><h3>'+esc(j.title)+(j.feat?' <span class="tag">Featured</span>':'')+'</h3>';
+ h+='<div class="meta">'+esc(j.co)+' • '+esc(j.city)+' • '+esc(j.cat)+'</div><div class="sal">'+esc(j.sal)+'</div>';
+ if(mode==='cand'){h+='<div class="row"><button class="btn ghost" data-act="detail" data-id="'+j.id+'">Details</button>'+(applied?'<span class="st">Applied ✓</span>':'<button class="btn" data-act="apply" data-id="'+j.id+'">Apply करें</button>')+'</div>'}
+ if(mode==='mine'){var n=S.apps.filter(function(a){return a.jobId===j.id}).length;
+  h+='<div class="row"><span class="meta">'+n+' candidates ने apply किया</span><button class="btn ghost" data-act="applicants" data-id="'+j.id+'">देखें</button></div>';
+  if(S.showApps===j.id){var l=S.apps.filter(function(a){return a.jobId===j.id});h+=l.length?l.map(function(a){return '<div class="app-row"><b>'+esc(a.name)+'</b> • '+esc(a.phone)+(a.city?' • '+esc(a.city):'')+(a.exp?' • '+esc(a.exp):'')+' <span class="meta">('+esc(a.at)+')</span></div>'}).join(''):'<div class="app-row meta">अभी कोई apply नहीं हुआ।</div>'}}
+ return h+'</div>'}
+function view(){
+ var h='<header><h1>KaamSetu</h1><p class="sub">आपके शहर की नौकरियाँ, सीधे phone पर (Demo)</p><div class="seg"><button data-act="role" data-v="cand" class="'+(S.role==='cand'?'on':'')+'">मुझे नौकरी चाहिए</button><button data-act="role" data-v="emp" class="'+(S.role==='emp'?'on':'')+'">मुझे staff चाहिए</button></div></header>';
+ if(S.role==='cand'&&S.tab===0){
+  h+='<input class="search" id="q" placeholder="शहर या job खोजें (जैसे Mumbai)" value="'+esc(S.q)+'">';
+  h+='<div class="chips">'+CATS.map(function(c){return '<button class="chip'+(S.cat===c?' on':'')+'" data-act="cat" data-v="'+c+'">'+c+'</button>'}).join('')+'</div>';
+  var q=S.q.toLowerCase();
+  var l=S.jobs.filter(function(j){return (S.cat==='सभी'||j.cat===S.cat)&&(!q||(j.city+' '+j.title+' '+j.co).toLowerCase().indexOf(q)>-1)}).sort(function(a,b){return (b.feat?1:0)-(a.feat?1:0)});
+  h+=l.length?l.map(function(j){return jobCard(j,'cand')}).join(''):'<div class="empty">इस search में कोई job नहीं मिली। शहर या category बदलकर देखें।</div>';
+ }else if(S.role==='cand'){
+  var my=S.apps.filter(function(a){return a.mine});
+  h+=my.length?my.map(function(a){var j=S.jobs.filter(function(x){return x.id===a.jobId})[0];return j?'<div class="job"><h3>'+esc(j.title)+'</h3><div class="meta">'+esc(j.co)+' • '+esc(j.city)+'</div><div class="row"><span class="st">Applied ✓</span><span class="meta">'+esc(a.at)+'</span></div></div>':''}).join(''):'<div class="empty">आपने अभी किसी job पर apply नहीं किया। पहली job चुनें।</div>';
+ }else if(S.tab===0){
+  h+='<div class="note">पहली 5 job posts free हैं। उसके बाद हर post ₹199 (demo में payment बंद है)।</div>';
+  h+='<label>Job का नाम</label><input id="f_title" placeholder="जैसे Telecaller">';
+  h+='<label>Category</label><select id="f_cat">'+CATS.slice(1).map(function(c){return '<option>'+c+'</option>'}).join('')+'</select>';
+  h+='<label>Salary</label><input id="f_sal" placeholder="जैसे ₹15,000–20,000">';
+  h+='<label>शहर</label><input id="f_city" placeholder="जैसे Mumbai">';
+  h+='<label>आपका WhatsApp नंबर (candidates यहीं message भेजेंगे)</label><input id="f_wa" inputmode="tel" placeholder="10 अंक">';
+  h+='<label>Job की जानकारी</label><textarea id="f_desc" placeholder="काम, timing, ज़रूरी योग्यता"></textarea>';
+  h+='<div class="row"><label style="margin:0;display:flex;gap:8px;align-items:center"><input type="checkbox" id="f_feat" style="width:auto"> Featured (₹499)</label><button class="btn" data-act="post">Job post करें</button></div>';
+ }else if(S.tab===1){
+  var mj=S.jobs.filter(function(j){return j.mine});
+  h+=mj.length?mj.map(function(j){return jobCard(j,'mine')}).join(''):'<div class="empty">आपने अभी कोई job post नहीं की। पहली job post करें।</div>';
+ }else{
+  var ids=S.jobs.filter(function(j){return j.mine}).map(function(j){return j.id});
+  var al=S.apps.filter(function(a){return ids.indexOf(a.jobId)>-1});
+  h+='<div class="note">आपकी सभी jobs पर apply करने वाले candidates यहाँ दिखते हैं। Demo में यह data सिर्फ़ इसी phone में रहता है।</div>';
+  h+=al.length?'<div class="row" style="margin:0 0 8px"><b>'+al.length+' candidates</b><button class="btn ghost" data-act="copy">List copy करें</button></div>'+al.map(function(a){var j=S.jobs.filter(function(x){return x.id===a.jobId})[0];return '<div class="job"><h3>'+esc(a.name)+'</h3><div class="meta">'+esc(j?j.title:'')+' • '+esc(a.at)+(a.city?' • '+esc(a.city):'')+(a.age?' • '+esc(a.age)+' साल':'')+(a.exp?' • '+esc(a.exp):'')+'</div><div class="row"><a class="btn" style="text-decoration:none" href="tel:'+esc(a.phone.replace(/[^0-9+]/g,''))+'">📞 '+esc(a.phone)+'</a></div></div>'}).join(''):'<div class="empty">अभी किसी ने apply नहीं किया। Job का link candidates को भेजें।</div>';
+ }
+ h+='<nav><div class="in">'+(S.role==='cand'?'<button data-act="tab" data-v="0" class="'+(S.tab===0?'on':'')+'">Jobs</button><button data-act="tab" data-v="1" class="'+(S.tab===1?'on':'')+'">मेरी Applications</button>':'<button data-act="tab" data-v="0" class="'+(S.tab===0?'on':'')+'">Job Post करें</button><button data-act="tab" data-v="1" class="'+(S.tab===1?'on':'')+'">मेरी Jobs</button><button data-act="tab" data-v="2" class="'+(S.tab===2?'on':'')+'">Candidates</button>')+'</div></nav>';
+ if(S.sheet){var j=S.jobs.filter(function(x){return x.id===S.sheet.id})[0];
+  h+='<div class="ov" data-act="close"><div class="sheet" data-stop="1"><h3 style="margin:0">'+esc(j.title)+'</h3><div class="meta">'+esc(j.co)+' • '+esc(j.city)+'</div><div class="sal">'+esc(j.sal)+'</div><p>'+esc(j.desc)+'</p>';
+  if(S.sheet.done){h+='<p><b>एक कदम बाकी है</b><br>WhatsApp में Send दबाकर message भेजें। भेजने के बाद नीचे "मैंने भेज दिया" दबाएँ, तभी Apply पूरा माना जाएगा।</p><button class="btn" style="width:100%;margin-bottom:8px" data-act="sent">मैंने भेज दिया ✓</button><div class="row"><button class="btn ghost" data-act="close">रद्द करें</button><a class="btn" style="text-decoration:none" target="_blank" rel="noopener" href="'+esc(waLink(j,S.sheet.done))+'">WhatsApp खोलें</a></div>'}
+  else if(S.sheet.apply){h+='<label>आपका नाम</label><input id="a_name"><label>Phone नंबर</label><input id="a_phone" inputmode="tel" placeholder="10 अंक"><label>आपका शहर</label><input id="a_city" placeholder="जैसे Mumbai"><label>उम्र</label><input id="a_age" inputmode="numeric" placeholder="जैसे 24"><label>Experience</label><select id="a_exp"><option>Fresher</option><option>1 साल से कम</option><option>1-3 साल</option><option>3+ साल</option></select><div class="row"><button class="btn ghost" data-act="close">रद्द करें</button><button class="btn" data-act="submit" data-id="'+j.id+'">Apply करें</button></div>'}
+  else{h+='<div class="row"><button class="btn ghost" data-act="close">बंद करें</button><button class="btn" data-act="apply" data-id="'+j.id+'">Apply करें</button></div>'}
+  h+='</div></div>'}
+ return h}
+function draw(){var a=document.activeElement&&document.activeElement.id,v=a?document.activeElement.value:null,p=a==='q'?document.activeElement.selectionStart:null;document.getElementById('app').innerHTML=view();if(a==='q'){var e=document.getElementById('q');e.value=v;e.focus();e.setSelectionRange(p,p)}}
+document.addEventListener('input',function(e){if(e.target.id==='q'){S.q=e.target.value;draw()}});
+document.addEventListener('click',function(e){
+ var el=e.target.closest('[data-act]');if(!el)return;
+ if(el.dataset.act==='close'&&e.target.closest('[data-stop]')&&!e.target.closest('button'))return;
+ var act=el.dataset.act,id=+el.dataset.id,v=el.dataset.v;
+ if(act==='role'){S.role=v;S.tab=0;S.showApps=null}
+ else if(act==='tab'){S.tab=+v;S.showApps=null}
+ else if(act==='cat'){S.cat=v}
+ else if(act==='detail'){S.sheet={id:id}}
+ else if(act==='apply'){S.sheet={id:id,apply:true}}
+ else if(act==='close'){S.sheet=null}
+ else if(act==='applicants'){S.showApps=S.showApps===id?null:id}
+ else if(act==='submit'){var n=document.getElementById('a_name').value.trim(),p=document.getElementById('a_phone').value.trim(),ct=document.getElementById('a_city').value.trim(),ag=document.getElementById('a_age').value.trim(),ex=document.getElementById('a_exp').value;
+  if(!n||p.replace(/\D/g,'').length<10){toast('नाम और 10 अंक का phone नंबर डालें');return}
+  var jb=S.jobs.filter(function(x){return x.id===id})[0];var dd={name:n,phone:p,city:ct,exp:ex,age:ag};S.sheet={id:id,done:dd};try{window.open(waLink(jb,dd),'_blank')}catch(err){}}
+ else if(act==='sent'){var s=S.sheet&&S.sheet.done;if(s){S.apps.push({id:Date.now(),jobId:S.sheet.id,name:s.name,phone:s.phone,city:s.city,exp:s.exp,age:s.age,at:'अभी',mine:true});save();S.sheet=null;toast('Apply हो गया ✓')}}
+ else if(act==='copy'){var ids2=S.jobs.filter(function(j){return j.mine}).map(function(j){return j.id});var txt=S.apps.filter(function(a){return ids2.indexOf(a.jobId)>-1}).map(function(a){var j=S.jobs.filter(function(x){return x.id===a.jobId})[0];return a.name+' | '+a.phone+' | '+(j?j.title:'')}).join('\n');try{navigator.clipboard.writeText(txt).then(function(){toast('List copy हो गई ✓')},function(){toast('Copy नहीं हो पाया')})}catch(err){toast('Copy नहीं हो पाया')};return}
+ else if(act==='post'){var t=document.getElementById('f_title').value.trim(),c=document.getElementById('f_city').value.trim();
+  if(!t||!c){toast('Job का नाम और शहर ज़रूर डालें');return}
+  S.jobs.unshift({id:Date.now(),title:t,cat:document.getElementById('f_cat').value,sal:document.getElementById('f_sal').value.trim()||'बातचीत से',city:c,desc:document.getElementById('f_desc').value.trim()||'जानकारी जल्द जोड़ी जाएगी।',feat:document.getElementById('f_feat').checked,wa:(document.getElementById('f_wa').value||'').replace(/\D/g,''),mine:true,co:'आपकी कंपनी'});
+  save();S.tab=1;toast('Job post हो गई ✓')}
+ draw()});
+load();draw();
+</script>
+</body>
+</html>
